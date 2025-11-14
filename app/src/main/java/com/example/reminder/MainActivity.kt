@@ -1,11 +1,18 @@
 package com.example.reminder
 
+import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.DatePickerDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.TimePicker
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -15,8 +22,44 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
+import java.util.Calendar
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import android.os.Build
 
 class MainActivity : AppCompatActivity() {
+
+    private fun createNotificationChannel()
+    {
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
+        {
+            val channel_id = "Task Notification"
+            val channel_name = "Task Notification"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(
+                channel_id,
+                channel_name,
+                importance
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+    private fun convertDate(date: String): LocalDate {
+        val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+        return LocalDate.parse(date, formatter)
+    }
+    private fun convertTime(time: String): LocalTime {
+        val formatter = DateTimeFormatter.ofPattern("H:mm")
+        return LocalTime.parse(time, formatter)
+    }
+    private fun sortReminders() {
+        reminders.sortWith(compareBy(
+            { convertDate(it.date) },
+            { convertTime(it.time) }
+        ))
+    }
 
     private fun loadData() {
         val sharedPref = getSharedPreferences("reminder_prefs", Context.MODE_PRIVATE)
@@ -36,35 +79,175 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
     }
 
+    private fun scheduleTask(task: ReminderItem, alarm: AlarmManager)
+    {
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            putExtra("title", "Nhắc nhở lịch")
+            putExtra("task", task.task)
+            putExtra("date", task.date)
+            putExtra("time", task.time)
+            putExtra("id", task.id)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            task.id,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
+        var taskmils = Calendar.getInstance()
+        taskmils.set(Calendar.YEAR, task.date.split("/")[2].toInt())
+        taskmils.set(Calendar.MONTH, task.date.split("/")[1].toInt() - 1)
+        taskmils.set(Calendar.DAY_OF_MONTH, task.date.split("/")[0].toInt())
+        taskmils.set(Calendar.HOUR_OF_DAY, task.time.split(":")[0].toInt())
+        taskmils.set(Calendar.MINUTE, task.time.split(":")[1].toInt())
+        alarm.setExact(AlarmManager.RTC_WAKEUP, taskmils.timeInMillis, pendingIntent)
+    }
+    private fun removeSchedule(task: ReminderItem, alarm: AlarmManager) {
+        val intent = Intent(this, AlarmReceiver::class.java).apply {
+            putExtra("title", "Nhắc nhở lịch")
+            putExtra("task", task.task)
+            putExtra("date", task.date)
+            putExtra("time", task.time)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            task.id,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        alarm.cancel(pendingIntent)
+    }
     private lateinit var adapter: ReminderAdapter
     private val reminders = mutableListOf<ReminderItem>()
     private val gson = Gson()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        //Tạo 1 kênh thông báo
+        createNotificationChannel()
+
+        //Tạo alarm manager
+        var alarm = getSystemService(ALARM_SERVICE) as AlarmManager
+
         val reminderView: RecyclerView = findViewById<RecyclerView>(R.id.ReminderSchedule)
         val addButton: Button = findViewById<Button>(R.id.btnAdd)
         loadData()
+        sortReminders()
+
+            //Khai báo adapter có 3 tham số truyên vào
+        // 1. Danh sách lịch
+        // 2. Hàm callback xóa lịch
+        // 3.. Hàm callback sửa thông tin lịch
         adapter = ReminderAdapter(
             reminders,
-            onSwitchChange = { item, isChecked ->
-                item.isActive = isChecked
-                saveData() //
-            },
             onDeleteClick = { item ->
                 reminders.remove(item)
                 adapter.notifyDataSetChanged()
                 saveData() //
+                removeSchedule(item, alarm)
+            },
+            onItemClick = {item, ->
+                //tạo dialogview để tý nữa popup lên
+                val dialogView = LayoutInflater.from(this).inflate(R.layout.itemreminder_dialog, null)
+                val timePicker: TimePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
+                val datepicker: Button = dialogView.findViewById<Button>(R.id.btnSelectDate)
+                lateinit var dateText: String
+                // Xử lý sự kiện khi nút chọn ngày được nhấn
+                datepicker.setOnClickListener {
+                    //tạo 1 thể hiện của lớp Calendar
+                    val calendar = Calendar.getInstance()
+                    // Ánh xạ text và lưu các biến ngày tháng năm
+                    val selectedDateText: TextView = dialogView.findViewById<TextView>(R.id.selectedDateText)
+                    val year = item.date.split("/")[2].toInt() //lấy năm của task hiện tại
+                    val month = item.date.split("/")[1].toInt() - 1 // Lấy tháng của task hiện tại
+                    val day = item.date.split("/")[0].toInt() // Lấy ngày của task hiện tại
+
+
+
+                    // Khởi tạo hộp thoại xổ ra để chọn ngày tháng năm
+                    val datePicker = DatePickerDialog(
+                        this, //ngữ cảnh hiển thị hộp thoại
+                        { _, selectedYear, selectedMonth, selectedDay -> //hàm callback
+                            val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                            selectedDateText.text = date
+                            dateText = date
+                        },
+                        //Gía trị hiển thị mặc định
+                        year, month, day
+                    )
+                    datePicker.show()
+                }
+                timePicker.setIs24HourView(true)
+                var task: EditText = dialogView.findViewById<EditText>(R.id.editTask)
+                val saveButton: Button = dialogView.findViewById<Button>(R.id.btnSave)
+                val cancelButton: Button = dialogView.findViewById<Button>(R.id.btnCancel)
+
+                //Hiển thị lại thông tin cũ
+                task.setText(item.task)
+                timePicker.hour = item.time.split(":")[0].toInt()
+                timePicker.minute = item.time.split(":")[1].toInt()
+
+                //Tạo dialog để chứa dialogview
+                val dialog = AlertDialog.Builder(this)
+                    .setTitle("Sửa lịch")
+                    .setView(dialogView)
+                    .create()
+
+                saveButton.setOnClickListener {
+                    val hour = timePicker.hour
+                    val minute = timePicker.minute
+                    val taskText = task.text.toString()
+                    val timestr = String.format("%02d:%02d", hour, minute)
+                    item.time = timestr
+                    item.date = dateText
+                    item.task = taskText
+                    sortReminders()
+                    adapter.notifyDataSetChanged()
+                    saveData() //lưu vào sharedprefs
+                    dialog.dismiss() //tắt hộp thoại
+                    removeSchedule(item, alarm)
+                    scheduleTask(item, alarm, )
+                }
+                cancelButton.setOnClickListener { dialog.dismiss() }
+                dialog.show()
+
             }
         )
-        reminderView.adapter = adapter
-        reminderView.layoutManager = LinearLayoutManager(this)
+        // Kết thúc khai báo adapter
+        //Gán gán adapter vừa khai báo vào adapter của recycleView và hiển thị ở màn hình hiện tại (this context)
+        reminderView.adapter = adapter // Hiểu là thông qua adapter, trông RecycleView sẽ như thế nào
+        reminderView.layoutManager = LinearLayoutManager(this) // Hiểu là gắn cái layout đó ở ngữ cảnh nào (this là ở ngữ cảnh này)
+
+        //Xử lý sự kiện của nút thêm lịch
         addButton.setOnClickListener {
             val dialogView = LayoutInflater.from(this).inflate(R.layout.itemreminder_dialog, null)
             val timePicker: TimePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
+            val datepicker: Button = dialogView.findViewById<Button>(R.id.btnSelectDate)
+            lateinit var dateText: String
+
+            datepicker.setOnClickListener {
+                val calendar = Calendar.getInstance()
+                val selectedDateText: TextView = dialogView.findViewById<TextView>(R.id.selectedDateText)
+                val year = calendar.get(Calendar.YEAR)
+                val month = calendar.get(Calendar.MONTH)
+                val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+                val datePicker = DatePickerDialog(
+                    this,
+                    { _, selectedYear, selectedMonth, selectedDay ->
+                        val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                        selectedDateText.text = date
+                        dateText = date
+                    },
+                    year, month, day
+                )
+
+                datePicker.show()
+            }
             timePicker.setIs24HourView(true)
             val task: EditText = dialogView.findViewById<EditText>(R.id.editTask)
             val saveButton: Button = dialogView.findViewById<Button>(R.id.btnSave)
@@ -80,10 +263,12 @@ class MainActivity : AppCompatActivity() {
                 val minute = timePicker.minute
                 val taskText = task.text.toString()
                 val timestr = String.format("%02d:%02d", hour, minute)
-                reminders.add(ReminderItem(timestr, taskText, true)) //hêm vào list
-                adapter.notifyItemInserted(reminders.size - 1)//báo adapter là có thay đổi
+                reminders.add(ReminderItem(timestr, dateText, taskText))
+                sortReminders()
+                adapter.notifyDataSetChanged()
                 saveData() //lưu vào sharedprefs
                 dialog.dismiss() //tắt hộp thoại
+                scheduleTask(reminders.last(), alarm)
             }
             cancelButton.setOnClickListener { dialog.dismiss() }
             dialog.show()

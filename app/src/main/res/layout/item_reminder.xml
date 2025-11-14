@@ -6,15 +6,30 @@
     android:gravity="center_vertical"
     android:background="@android:color/white">
 
-    <!-- Thời gian -->
-    <TextView
-        android:id="@+id/TimeText"
+    <!-- Khối thời gian (giờ + ngày ngang nhau) -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_weight="1"
-        android:text="Thời gian"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/TimeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="07:30"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/DateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="12/11/2025"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <!-- Công việc -->
     <TextView
@@ -22,24 +37,17 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
+        android:layout_marginStart="20dp"
         android:text="Lịch học"
         android:textSize="16sp"
         android:textColor="@android:color/darker_gray" />
 
-    <!-- Switch bật/tắt -->
-    <Switch
-        android:id="@+id/switchActive"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="true" />
-
     <!-- Nút xóa -->
     <ImageButton
         android:id="@+id/DeleteTaskButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:src="@android:drawable/ic_menu_delete"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Xóa lịch" />
-
 </LinearLayout>

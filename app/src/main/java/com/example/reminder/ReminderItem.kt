@@ -1,7 +1,16 @@
 package com.example.reminder
 
 class ReminderItem(
-    val time: String,
-    val task: String,
-    var isActive: Boolean = true
+    var time: String,
+    var date: String,
+    var task: String
 )
+{
+    val id: Int = getNextid()
+    companion object {
+        private var nextId: Int = 0
+        fun getNextid(): Int {
+            return nextId++
+        }
+    }
+}

@@ -15,30 +15,51 @@
         android:id="@+id/editTask"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:hint="Nhập công việc..."
-        android:inputType="text"
-        android:layout_marginTop="16dp" />
+        android:inputType="text" />
+
+    <!-- NÚT CHỌN NGÀY (thay thế phần lặp ngày) -->
+    <Button
+        android:id="@+id/btnSelectDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Chọn ngày"
+        android:textSize="16sp" />
+
+    <!-- Sau khi chọn ngày thì nó sẽ hiện ở đây -->
+    <TextView
+        android:id="@+id/selectedDateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Chưa chọn ngày"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
         android:gravity="end"
-        android:layout_marginTop="20dp">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hủy" />
+            android:text="Hủy"
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:text="Lưu"
-            android:layout_marginStart="10dp" />
-    </LinearLayout>
+            android:textSize="16sp" />
 
+    </LinearLayout>
 
 </LinearLayout>
