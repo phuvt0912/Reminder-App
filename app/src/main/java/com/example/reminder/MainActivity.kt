@@ -90,16 +90,87 @@ class MainActivity : AppCompatActivity() {
         val addButton: Button = findViewById<Button>(R.id.btnAdd)
         loadData()
         sortReminders()
+
+            //Khai báo adapter có 3 tham số truyên vào
+        // 1. Danh sách lịch
+        // 2. Hàm callback xóa lịch
+        // 3.. Hàm callback sửa thông tin lịch
         adapter = ReminderAdapter(
             reminders,
             onDeleteClick = { item ->
                 reminders.remove(item)
                 adapter.notifyDataSetChanged()
                 saveData() //
+            },
+            onItemClick = {item, ->
+                //tạo dialogview để tý nữa popup lên
+                val dialogView = LayoutInflater.from(this).inflate(R.layout.itemreminder_dialog, null)
+                val timePicker: TimePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
+                val datepicker: Button = dialogView.findViewById<Button>(R.id.btnSelectDate)
+                lateinit var dateText: String
+                // Xử lý sự kiện khi nút chọn ngày được nhấn
+                datepicker.setOnClickListener {
+                    //tạo 1 thể hiện của lớp Calendar
+                    val calendar = Calendar.getInstance()
+                    // Ánh xạ text và lưu các biến ngày tháng năm
+                    val selectedDateText: TextView = dialogView.findViewById<TextView>(R.id.selectedDateText)
+                    val year = item.date.split("/")[2].toInt() //lấy năm của task hiện tại
+                    val month = item.date.split("/")[1].toInt() - 1 // Lấy tháng của task hiện tại
+                    val day = item.date.split("/")[0].toInt() // Lấy ngày của task hiện tại
+
+
+
+                    // Khởi tạo hộp thoại xổ ra để chọn ngày tháng năm
+                    val datePicker = DatePickerDialog(
+                        this, //ngữ cảnh hiển thị hộp thoại
+                        { _, selectedYear, selectedMonth, selectedDay -> //hàm callback
+                            val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                            selectedDateText.text = date
+                            dateText = date
+                        },
+                        //Gía trị hiển thị mặc định
+                        year, month, day
+                    )
+                    datePicker.show()
+                }
+                timePicker.setIs24HourView(true)
+                var task: EditText = dialogView.findViewById<EditText>(R.id.editTask)
+                val saveButton: Button = dialogView.findViewById<Button>(R.id.btnSave)
+                val cancelButton: Button = dialogView.findViewById<Button>(R.id.btnCancel)
+
+                //Hiển thị lại thông tin cũ
+                task.setText(item.task)
+                timePicker.hour = item.time.split(":")[0].toInt()
+                timePicker.minute = item.time.split(":")[1].toInt()
+                val dialog = AlertDialog.Builder(this)
+                    .setTitle("Sửa lịch")
+                    .setView(dialogView)
+                    .create()
+
+                saveButton.setOnClickListener {
+                    val hour = timePicker.hour
+                    val minute = timePicker.minute
+                    val taskText = task.text.toString()
+                    val timestr = String.format("%02d:%02d", hour, minute)
+                    item.time = timestr
+                    item.date = dateText
+                    item.task = taskText
+                    sortReminders()
+                    adapter.notifyDataSetChanged()
+                    saveData() //lưu vào sharedprefs
+                    dialog.dismiss() //tắt hộp thoại
+                }
+                cancelButton.setOnClickListener { dialog.dismiss() }
+                dialog.show()
+
             }
         )
+        // Kết thúc khai báo adapter
+        //Gán gán adapter vừa khai báo vào adapter của recycleView và hiển thị ở màn hình hiện tại (this context)
         reminderView.adapter = adapter // Hiểu là thông qua adapter, trông RecycleView sẽ như thế nào
         reminderView.layoutManager = LinearLayoutManager(this) // Hiểu là gắn cái layout đó ở ngữ cảnh nào (this là ở ngữ cảnh này)
+
+        //Xử lý sự kiện của nút thêm lịch
         addButton.setOnClickListener {
             val dialogView = LayoutInflater.from(this).inflate(R.layout.itemreminder_dialog, null)
             val timePicker: TimePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)

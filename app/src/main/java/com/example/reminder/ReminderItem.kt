@@ -1,9 +1,9 @@
 package com.example.reminder
 
 class ReminderItem(
-    val time: String,
-    val date: String,
-    val task: String
+    var time: String,
+    var date: String,
+    var task: String
 )
 {
     val id: Int = getNextid()

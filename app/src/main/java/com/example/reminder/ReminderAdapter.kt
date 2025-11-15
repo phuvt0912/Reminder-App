@@ -10,7 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ReminderAdapter(
     private val reminders: MutableList<ReminderItem>,
-    private val onDeleteClick: (ReminderItem) -> Unit
+    private val onDeleteClick: (ReminderItem) -> Unit,
+    private val onItemClick: (ReminderItem) -> Unit
 ) : RecyclerView.Adapter<ReminderAdapter.ReminderViewHolder>() {
 
     class ReminderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -37,7 +38,12 @@ class ReminderAdapter(
         holder.btnDelete.setOnClickListener {
             onDeleteClick(reminder)
         }
+
+        holder.itemView.setOnClickListener {
+            onItemClick(reminder)
+        }
     }
+
 
     override fun getItemCount() = reminders.size
 }
