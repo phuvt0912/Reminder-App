@@ -2,6 +2,8 @@ package com.example.reminder
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,9 +23,26 @@ import java.util.Calendar
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import android.os.Build
 
 class MainActivity : AppCompatActivity() {
 
+    private fun createNotificationChannel()
+    {
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
+        {
+            val channel_id = "Task Notification"
+            val channel_name = "Task Notification"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(
+                channel_id,
+                channel_name,
+                importance
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
     private fun convertDate(date: String): LocalDate {
         val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
         return LocalDate.parse(date, formatter)
@@ -66,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        createNotificationChannel()
         val reminderView: RecyclerView = findViewById<RecyclerView>(R.id.ReminderSchedule)
         val addButton: Button = findViewById<Button>(R.id.btnAdd)
         loadData()
