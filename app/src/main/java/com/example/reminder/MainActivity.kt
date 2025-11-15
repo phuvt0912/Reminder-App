@@ -24,6 +24,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import android.os.Build
+import android.widget.ImageButton
 
 class MainActivity : AppCompatActivity() {
 
@@ -103,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         addButton.setOnClickListener {
             val dialogView = LayoutInflater.from(this).inflate(R.layout.itemreminder_dialog, null)
             val timePicker: TimePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
-            val datepicker: Button = dialogView.findViewById<Button>(R.id.btnSelectDate)
+            val datepicker: ImageButton = dialogView.findViewById<ImageButton>(R.id.btnSelectDate)
             lateinit var dateText: String
 
             datepicker.setOnClickListener {
