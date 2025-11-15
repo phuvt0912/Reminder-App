@@ -19,73 +19,24 @@
         android:hint="Nhập công việc..."
         android:inputType="text" />
 
-    <!-- START OF NEW DAY SELECTOR SECTION -->
-    <TextView
+    <!-- NÚT CHỌN NGÀY (thay thế phần lặp ngày) -->
+    <Button
+        android:id="@+id/btnSelectDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Lặp lại vào các ngày:"
-        android:textSize="16sp"/>
+        android:text="Chọn ngày"
+        android:textSize="16sp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- Sau khi chọn ngày thì nó sẽ hiện ở đây -->
+    <TextView
+        android:id="@+id/selectedDateText"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <!-- We will create a single style for all the buttons -->
-        <ToggleButton
-            android:id="@+id/toggleMon"
-            style="@style/DayToggle"
-            android:textOff="M"
-            android:textOn="M" />
-
-        <ToggleButton
-            android:id="@+id/toggleTue"
-            style="@style/DayToggle"
-            android:layout_marginStart="8dp"
-            android:textOff="T"
-            android:textOn="T" />
-
-        <ToggleButton
-            android:id="@+id/toggleWed"
-            style="@style/DayToggle"
-            android:layout_marginStart="8dp"
-            android:textOff="W"
-            android:textOn="W" />
-
-        <ToggleButton
-            android:id="@+id/toggleThu"
-            style="@style/DayToggle"
-            android:layout_marginStart="8dp"
-            android:textOff="T"
-            android:textOn="T" />
-
-         <ToggleButton
-            android:id="@+id/toggleFri"
-            style="@style/DayToggle"
-            android:layout_marginStart="8dp"
-            android:textOff="F"
-            android:textOn="F" />
-
-        <ToggleButton
-            android:id="@+id/toggleSat"
-            style="@style/DayToggle"
-            android:layout_marginStart="8dp"
-            android:textOff="S"
-            android:textOn="S" />
-
-        <ToggleButton
-            android:id="@+id/toggleSun"
-            style="@style/DayToggle"
-            android:layout_marginStart="8dp"
-            android:textOff="S"
-            android:textOn="S" />
-
-    </LinearLayout>
-    <!-- END OF NEW DAY SELECTOR SECTION -->
-
+        android:layout_marginTop="8dp"
+        android:text="Chưa chọn ngày"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -94,23 +45,20 @@
         android:gravity="end"
         android:orientation="horizontal">
 
-        <!-- It's better to use MaterialButton for modern styling -->
         <Button
             android:id="@+id/btnCancel"
-            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hủy"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btnSave"
-            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Lưu"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
     </LinearLayout>
 
