@@ -10,14 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ReminderAdapter(
     private val reminders: MutableList<ReminderItem>,
-    private val onSwitchChange: (ReminderItem, Boolean) -> Unit,
     private val onDeleteClick: (ReminderItem) -> Unit
 ) : RecyclerView.Adapter<ReminderAdapter.ReminderViewHolder>() {
 
     class ReminderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvTime: TextView = itemView.findViewById(R.id.TimeText)
+        val tvDate: TextView = itemView.findViewById(R.id.DateText)
         val tvTask: TextView = itemView.findViewById(R.id.TaskText)
-        val switchActive: Switch = itemView.findViewById(R.id.switchActive)
         val btnDelete: ImageButton = itemView.findViewById(R.id.DeleteTaskButton)
     }
 
@@ -31,13 +30,8 @@ class ReminderAdapter(
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         val reminder = reminders[position]
         holder.tvTime.text = reminder.time
+        holder.tvDate.text = reminder.date
         holder.tvTask.text = reminder.task
-        holder.switchActive.isChecked = reminder.isActive
-
-        // Khi bật/tắt switch
-        holder.switchActive.setOnCheckedChangeListener { _, isChecked ->
-            onSwitchChange(reminder, isChecked)
-        }
 
         // Khi nhấn nút xóa
         holder.btnDelete.setOnClickListener {
