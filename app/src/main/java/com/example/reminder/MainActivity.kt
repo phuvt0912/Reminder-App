@@ -29,6 +29,10 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import android.os.Build
 import android.widget.ImageButton
+import android.widget.Toast
+import java.time.Month
+import java.time.MonthDay
+import java.time.Year
 
 class MainActivity : AppCompatActivity() {
 
@@ -151,19 +155,25 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
                 saveData() //
                 removeSchedule(item, alarm)
+                Toast.makeText(this, "Xóa thành công, ${item.id}", Toast.LENGTH_SHORT).show()
             },
             onItemClick = {item, ->
                 //tạo dialogview để tý nữa popup lên
                 val dialogView = LayoutInflater.from(this).inflate(R.layout.itemreminder_dialog, null)
                 val timePicker: TimePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
                 val datepicker: ImageButton = dialogView.findViewById<ImageButton>(R.id.btnSelectDate)
+                var selectedDateText: TextView = dialogView.findViewById<TextView>(R.id.selectedDateText)
                 lateinit var dateText: String
+
+                var selectedYear: Int? = null
+                var selectedMonth: Int? = null
+                var selectedDay: Int? = null
                 // Xử lý sự kiện khi nút chọn ngày được nhấn
                 datepicker.setOnClickListener {
                     //tạo 1 thể hiện của lớp Calendar
                     val calendar = Calendar.getInstance()
                     // Ánh xạ text và lưu các biến ngày tháng năm
-                    val selectedDateText: TextView = dialogView.findViewById<TextView>(R.id.selectedDateText)
+
                     val year = item.date.split("/")[2].toInt() //lấy năm của task hiện tại
                     val month = item.date.split("/")[1].toInt() - 1 // Lấy tháng của task hiện tại
                     val day = item.date.split("/")[0].toInt() // Lấy ngày của task hiện tại
@@ -188,10 +198,17 @@ class MainActivity : AppCompatActivity() {
                 val saveButton: Button = dialogView.findViewById<Button>(R.id.btnSave)
                 val cancelButton: Button = dialogView.findViewById<Button>(R.id.btnCancel)
 
-                //Hiển thị lại thông tin cũ
+                //Hiển thị lại thông tin cũ và gán lại giá trị của lịch cũ
                 task.setText(item.task)
                 timePicker.hour = item.time.split(":")[0].toInt()
                 timePicker.minute = item.time.split(":")[1].toInt()
+
+                selectedDay = item.date.split("/")[0].toInt()
+                selectedMonth = item.date.split("/")[1].toInt() - 1
+                selectedYear = item.date.split("/")[2].toInt()
+
+                selectedDateText.text = item.date
+                dateText = item.date
 
                 //Tạo dialog để chứa dialogview
                 val dialog = AlertDialog.Builder(this)
@@ -204,6 +221,11 @@ class MainActivity : AppCompatActivity() {
                     val minute = timePicker.minute
                     val taskText = task.text.toString()
                     val timestr = String.format("%02d:%02d", hour, minute)
+                    if (taskText.isEmpty()  || timestr.isEmpty() || (selectedDay == null) || selectedMonth == null || selectedYear == null)
+                    {
+                        Toast.makeText(this, "Vui lòng nhập đầy đủ nội dung", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
                     item.time = timestr
                     item.date = dateText
                     item.task = taskText
@@ -213,6 +235,7 @@ class MainActivity : AppCompatActivity() {
                     dialog.dismiss() //tắt hộp thoại
                     removeSchedule(item, alarm)
                     scheduleTask(item, alarm, )
+                    Toast.makeText(this, "Sửa thành công, ${item.id}", Toast.LENGTH_SHORT).show()
                 }
                 cancelButton.setOnClickListener { dialog.dismiss() }
                 dialog.show()
@@ -230,6 +253,9 @@ class MainActivity : AppCompatActivity() {
             val timePicker: TimePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
             val datepicker: ImageButton = dialogView.findViewById<ImageButton>(R.id.btnSelectDate)
             lateinit var dateText: String
+            var selectedYear: Int? = null
+            var selectedMonth: Int? = null
+            var selectedDay: Int? = null
 
             datepicker.setOnClickListener {
                 val calendar = Calendar.getInstance()
@@ -238,10 +264,15 @@ class MainActivity : AppCompatActivity() {
                 val month = calendar.get(Calendar.MONTH)
                 val day = calendar.get(Calendar.DAY_OF_MONTH)
 
+
+
                 val datePicker = DatePickerDialog(
                     this,
-                    { _, selectedYear, selectedMonth, selectedDay ->
-                        val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                    { _, sltYear, sltMonth, sltDay ->
+                        val date = "$sltDay/${sltMonth + 1}/$sltYear"
+                        selectedDay = sltDay
+                        selectedMonth = sltMonth
+                        selectedYear = sltYear
                         selectedDateText.text = date
                         dateText = date
                     },
@@ -265,12 +296,18 @@ class MainActivity : AppCompatActivity() {
                 val minute = timePicker.minute
                 val taskText = task.text.toString()
                 val timestr = String.format("%02d:%02d", hour, minute)
+                if (taskText.isEmpty()  || timestr.isEmpty() || (selectedDay == null) || selectedMonth == null || selectedYear == null)
+                {
+                    Toast.makeText(this, "Vui lòng nhập đầy đủ nội dung", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
                 reminders.add(ReminderItem(timestr, dateText, taskText))
                 sortReminders()
                 adapter.notifyDataSetChanged()
                 saveData() //lưu vào sharedprefs
                 dialog.dismiss() //tắt hộp thoại
                 scheduleTask(reminders.last(), alarm)
+                Toast.makeText(this, "Thêm thành công, ${reminders.last().id}", Toast.LENGTH_SHORT).show()
             }
             cancelButton.setOnClickListener { dialog.dismiss() }
             dialog.show()
