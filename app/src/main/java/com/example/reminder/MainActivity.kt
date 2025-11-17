@@ -8,6 +8,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.Image
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Button
@@ -155,7 +156,7 @@ class MainActivity : AppCompatActivity() {
                 //tạo dialogview để tý nữa popup lên
                 val dialogView = LayoutInflater.from(this).inflate(R.layout.itemreminder_dialog, null)
                 val timePicker: TimePicker = dialogView.findViewById<TimePicker>(R.id.timePicker)
-                val datepicker: Button = dialogView.findViewById<Button>(R.id.btnSelectDate)
+                val datepicker: ImageButton = dialogView.findViewById<ImageButton>(R.id.btnSelectDate)
                 lateinit var dateText: String
                 // Xử lý sự kiện khi nút chọn ngày được nhấn
                 datepicker.setOnClickListener {
