@@ -42,7 +42,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Chưa chọn ngày"
             android:textSize="16sp"
             android:textColor="@android:color/darker_gray" />
 

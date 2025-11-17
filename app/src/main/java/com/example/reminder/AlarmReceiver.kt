@@ -20,7 +20,7 @@ class AlarmReceiver(): BroadcastReceiver() {
         var build = NotificationCompat.Builder(context, "Task Notification")
             .setContentTitle(title)
             .setContentText(message)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .build()
 
