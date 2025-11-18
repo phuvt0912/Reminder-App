@@ -11,7 +11,6 @@ import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.media.AudioAttributes
 import android.net.Uri
-import android.os.Build
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.EditText
@@ -28,37 +27,26 @@ import com.google.gson.Gson
 
 object ReminderHelper {
     val gson = Gson()
-    fun deleteItem(context: Context, reminders: MutableList<ReminderItem>, item: ReminderItem, adapter: ReminderAdapter, alarm: AlarmManager)
-    {
-        reminders.remove(item)
-        adapter.notifyDataSetChanged()
-        ReminderHelper.saveData(context, reminders) //
-        ReminderHelper.removeSchedule(context,item, alarm)
-        Toast.makeText(context, "Xóa thành công, ${item.id}", Toast.LENGTH_SHORT).show()
-    }
     fun createNotificationChannel(context: Context)
     {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            val audioAttrs = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ALARM)   // hoặc USAGE_ALARM nếu muốn bypass DND
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
+        val audioAttrs = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)   // hoặc USAGE_ALARM nếu muốn bypass DND
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
 
-            val soundurl = Uri.parse("android.resource://${context?.packageName}/${R.raw.soundeffect}")
-            val channel_id = "Task Notification"
-            val channel_name = "Task Notification"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(
-                channel_id,
-                channel_name,
-                importance
-            ).apply {
-                setSound(soundurl, audioAttrs)
-            }
-            val manager = context.getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+        val soundurl = Uri.parse("android.resource://${context.packageName}/${R.raw.soundeffect}")
+        val channel_id = "Task Notification"
+        val channel_name = "Task Notification"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel(
+            channel_id,
+            channel_name,
+            importance
+        ).apply {
+            setSound(soundurl, audioAttrs)
         }
+        val manager = context.getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(channel)
     }
     fun convertDate(date: String): LocalDate {
         val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
@@ -224,7 +212,8 @@ object ReminderHelper {
 
                 reminders.add(newItem)
                 sortReminders(reminders)
-                adapter.notifyDataSetChanged()
+                val position = reminders.indexOf(newItem)
+                adapter.notifyItemInserted(position)
                 saveData(context, reminders)
 
                 scheduleTask(context,newItem, alarm)
@@ -237,7 +226,8 @@ object ReminderHelper {
                 existingItem.task = taskText
 
                 sortReminders(reminders)
-                adapter.notifyDataSetChanged()
+                val position = reminders.indexOf(existingItem)
+                adapter.notifyItemInserted(position)
                 saveData(context, reminders)
 
                 removeSchedule(context,existingItem, alarm)
