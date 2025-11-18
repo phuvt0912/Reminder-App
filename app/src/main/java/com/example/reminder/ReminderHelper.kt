@@ -198,8 +198,22 @@ object ReminderHelper {
             val taskText = task.text.toString()
             val timestr = String.format("%02d:%02d", hour, minute)
 
+            val today = LocalDate.now()
+            val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+            val formattedDate = today.format(formatter)
+
             if (taskText.isEmpty() || selectedYear == null || selectedMonth == null || selectedDay == null) {
                 Toast.makeText(context, "Vui lòng nhập đầy đủ nội dung", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (convertTime(timestr) < LocalTime.now())
+            {
+                Toast.makeText(context, "Thời gian không hợp lệ", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (convertDate(dateText) < convertDate(formattedDate))
+            {
+                Toast.makeText(context, "Ngày không hợp lệ", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
