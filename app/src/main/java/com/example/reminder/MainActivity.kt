@@ -1,33 +1,14 @@
 package com.example.reminder
 
 import android.app.AlarmManager
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.TimePicker
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.reflect.TypeToken
-import com.google.gson.Gson
-import java.util.Calendar
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import android.os.Build
-import android.widget.ImageButton
 import android.widget.Toast
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ReminderAdapter

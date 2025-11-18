@@ -206,17 +206,19 @@ object ReminderHelper {
                 Toast.makeText(context, "Vui lòng nhập đầy đủ nội dung", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            if (convertTime(timestr) < LocalTime.now())
-            {
-                Toast.makeText(context, "Thời gian không hợp lệ", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
             if (convertDate(dateText) < convertDate(formattedDate))
             {
-                Toast.makeText(context, "Ngày không hợp lệ", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Vui lòng chọn ngày trong tương lai", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
+            else if (convertDate(dateText) == convertDate(formattedDate))
+            {
+                if(convertTime(timestr) < LocalTime.now())
+                {
+                    Toast.makeText(context, "Vui lòng chọn thời gian trong tương lai", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+            }
             if (existingItem == null) {
                 // chế độ thêm lịch
                 val newId =
@@ -226,8 +228,7 @@ object ReminderHelper {
 
                 reminders.add(newItem)
                 sortReminders(reminders)
-                val position = reminders.indexOf(newItem)
-                adapter.notifyItemInserted(position)
+                adapter.notifyDataSetChanged()
                 saveData(context, reminders)
 
                 scheduleTask(context,newItem, alarm)
@@ -240,8 +241,7 @@ object ReminderHelper {
                 existingItem.task = taskText
 
                 sortReminders(reminders)
-                val position = reminders.indexOf(existingItem)
-                adapter.notifyItemInserted(position)
+                adapter.notifyDataSetChanged()
                 saveData(context, reminders)
 
                 removeSchedule(context,existingItem, alarm)
