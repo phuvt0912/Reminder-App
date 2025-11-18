@@ -56,11 +56,7 @@ class MainActivity : AppCompatActivity() {
         adapter = ReminderAdapter(
             reminders,
             onDeleteClick = { item ->
-                reminders.remove(item)
-                adapter.notifyDataSetChanged()
-                ReminderHelper.saveData(this, reminders) //
-                ReminderHelper.removeSchedule(this,item, alarm)
-                Toast.makeText(this, "Xóa thành công, ${item.id}", Toast.LENGTH_SHORT).show()
+                ReminderHelper.deleteItem(this, reminders, item, adapter, alarm)
             },
             //Sự kiện click vào item để chỉnh sửa
             onItemClick = {item, ->

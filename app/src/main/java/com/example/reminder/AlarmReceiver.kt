@@ -24,6 +24,7 @@ class AlarmReceiver(): BroadcastReceiver() {
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setAutoCancel(true)
             .build()
 
         var notificationManager = context?.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager

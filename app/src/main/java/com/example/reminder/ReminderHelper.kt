@@ -28,6 +28,14 @@ import com.google.gson.Gson
 
 object ReminderHelper {
     val gson = Gson()
+    fun deleteItem(context: Context, reminders: MutableList<ReminderItem>, item: ReminderItem, adapter: ReminderAdapter, alarm: AlarmManager)
+    {
+        reminders.remove(item)
+        adapter.notifyDataSetChanged()
+        ReminderHelper.saveData(context, reminders) //
+        ReminderHelper.removeSchedule(context,item, alarm)
+        Toast.makeText(context, "Xóa thành công, ${item.id}", Toast.LENGTH_SHORT).show()
+    }
     fun createNotificationChannel(context: Context)
     {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
