@@ -70,10 +70,6 @@ object ReminderHelper {
             val type = object : TypeToken<MutableList<ReminderItem>>() {}.type
             val loadedList: MutableList<ReminderItem> = gson.fromJson(json, type)
             reminders.addAll(loadedList)
-            for (reminder in reminders)
-            {
-                scheduleTask(context,reminder, context.getSystemService(ALARM_SERVICE) as AlarmManager)
-            }
         }
         Toast.makeText(context, "Có ${reminders.size} lịch đã đặt trước", Toast.LENGTH_SHORT).show()
     }
