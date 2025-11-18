@@ -9,6 +9,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
+import android.media.AudioAttributes
+import android.net.Uri
 import android.os.Build
 import android.view.LayoutInflater
 import android.widget.Button
@@ -30,6 +32,12 @@ object ReminderHelper {
     {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
+            val audioAttrs = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)   // hoặc USAGE_ALARM nếu muốn bypass DND
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+
+            val soundurl = Uri.parse("android.resource://${context?.packageName}/${R.raw.soundeffect}")
             val channel_id = "Task Notification"
             val channel_name = "Task Notification"
             val importance = NotificationManager.IMPORTANCE_HIGH
@@ -37,7 +45,9 @@ object ReminderHelper {
                 channel_id,
                 channel_name,
                 importance
-            )
+            ).apply {
+                setSound(soundurl, audioAttrs)
+            }
             val manager = context.getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }

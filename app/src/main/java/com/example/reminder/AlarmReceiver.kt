@@ -3,6 +3,7 @@ package com.example.reminder
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.core.app.NotificationCompat
 
 class AlarmReceiver(): BroadcastReceiver() {
@@ -16,6 +17,7 @@ class AlarmReceiver(): BroadcastReceiver() {
 
 
         val message = "Task: $task\nDate: $date\nTime: $time"
+
 
         var build = NotificationCompat.Builder(context, "Task Notification")
             .setContentTitle(title)
